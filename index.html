@@ -1,4 +1,3 @@
-<!-- ======================= index.html ======================= -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,9 +18,10 @@
 
 <link rel="stylesheet" href="style.css">
 
-<!-- AdSense (replace ID) -->
+<!-- AdSense -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
 </head>
+
 <body>
 
 <header>
@@ -33,13 +33,37 @@
 </header>
 
 <main>
-  <canvas id="wheel" width="320" height="320"></canvas>
-  <button id="spinBtn">SPIN</button>
 
-  <textarea id="names" placeholder="Enter names, one per line"></textarea>
+  <!-- Wheel -->
+  <div class="wheel-wrap">
+    <canvas id="wheel" width="320" height="320"></canvas>
+    <button id="spinBtn" aria-label="Spin wheel"></button>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button id="entriesTab" class="active">Entries (10)</button>
+    <button id="resultsTab">Results (0)</button>
+  </div>
+
+  <!-- Panels -->
+  <div class="panels">
+
+    <!-- Entries -->
+    <div id="entriesPanel" class="panel active">
+      <textarea id="names" placeholder="Enter names, one per line"></textarea>
+    </div>
+
+    <!-- Results -->
+    <div id="resultsPanel" class="panel">
+      <ul id="resultsList"></ul>
+    </div>
+
+  </div>
+
 </main>
 
-<!-- Ad below interaction (RPM safe) -->
+<!-- Ad below interaction -->
 <div class="ads">
   <ins class="adsbygoogle"
        style="display:block"
