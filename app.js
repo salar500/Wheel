@@ -1,10 +1,15 @@
-// ======================= app.js =======================
+// ======================= SETUP =======================
 
-// Canvas setup
 const canvas = document.getElementById("wheel");
 const ctx = canvas.getContext("2d");
 const spinBtn = document.getElementById("spinBtn");
 const namesInput = document.getElementById("names");
+
+const entriesTab = document.getElementById("entriesTab");
+const resultsTab = document.getElementById("resultsTab");
+const entriesPanel = document.getElementById("entriesPanel");
+const resultsPanel = document.getElementById("resultsPanel");
+const resultsList = document.getElementById("resultsList");
 
 const SIZE = canvas.width;
 const CX = SIZE / 2;
@@ -13,18 +18,28 @@ const RADIUS = SIZE / 2 - 10;
 
 let rotation = 0;
 let spinning = false;
+let results = [];
 
-// ----------- UTILITIES -----------
+// ======================= DEFAULT NAMES =======================
+
+const DEFAULT_NAMES = [
+  "Ali", "Beatriz", "Charles", "Diana", "Ethan",
+  "Fatima", "George", "Hana", "Ivan", "Julia"
+];
+
+namesInput.value = DEFAULT_NAMES.join("\n");
+
+// ======================= UTILITIES =======================
 
 function easeOutCubic(t) {
   return 1 - Math.pow(1 - t, 3);
 }
 
-function random(min, max) {
+function rand(min, max) {
   return Math.random() * (max - min) + min;
 }
 
-// ----------- DATA MODEL -----------
+// ======================= ENTRIES =======================
 
 function getEntries() {
   const lines = namesInput.value
@@ -33,17 +48,17 @@ function getEntries() {
     .filter(Boolean);
 
   const count = lines.length;
-  const anglePerSlice = (Math.PI * 2) / count;
+  const angle = (Math.PI * 2) / count;
 
   return lines.map((label, i) => ({
     label,
-    startAngle: i * anglePerSlice,
-    angle: anglePerSlice,
-    color: `hsl(${(i * 360) / count}, 80%, 60%)`
+    start: i * angle,
+    angle,
+    color: `hsl(${(i * 360) / count},80%,60%)`
   }));
 }
 
-// ----------- DRAWING -----------
+// ======================= DRAW =======================
 
 function drawWheel() {
   const entries = getEntries();
@@ -51,27 +66,20 @@ function drawWheel() {
 
   ctx.clearRect(0, 0, SIZE, SIZE);
 
-  entries.forEach(entry => {
+  entries.forEach(e => {
     ctx.beginPath();
     ctx.moveTo(CX, CY);
-    ctx.arc(
-      CX,
-      CY,
-      RADIUS,
-      rotation + entry.startAngle,
-      rotation + entry.startAngle + entry.angle
-    );
-    ctx.fillStyle = entry.color;
+    ctx.arc(CX, CY, RADIUS, rotation + e.start, rotation + e.start + e.angle);
+    ctx.fillStyle = e.color;
     ctx.fill();
 
-    // Draw text
     ctx.save();
     ctx.translate(CX, CY);
-    ctx.rotate(rotation + entry.startAngle + entry.angle / 2);
+    ctx.rotate(rotation + e.start + e.angle / 2);
     ctx.textAlign = "right";
     ctx.fillStyle = "#000";
     ctx.font = "14px system-ui";
-    ctx.fillText(entry.label, RADIUS - 12, 5);
+    ctx.fillText(e.label, RADIUS - 12, 5);
     ctx.restore();
   });
 
@@ -81,7 +89,6 @@ function drawWheel() {
   ctx.fillStyle = "#fff";
   ctx.fill();
 
-  // Center text
   ctx.fillStyle = "#333";
   ctx.font = "bold 14px system-ui";
   ctx.textAlign = "center";
@@ -93,62 +100,88 @@ function drawWheel() {
   ctx.moveTo(SIZE - 5, CY);
   ctx.lineTo(SIZE - 25, CY - 10);
   ctx.lineTo(SIZE - 25, CY + 10);
-  ctx.closePath();
   ctx.fill();
 }
 
-// ----------- WINNER LOGIC -----------
+// ======================= WINNER =======================
 
 function getWinner() {
   const entries = getEntries();
-  const normalized =
-    (Math.PI * 2 - (rotation % (Math.PI * 2))) % (Math.PI * 2);
-
+  const norm = (Math.PI * 2 - rotation % (Math.PI * 2)) % (Math.PI * 2);
   let acc = 0;
-  for (const entry of entries) {
-    acc += entry.angle;
-    if (normalized <= acc) return entry.label;
+
+  for (const e of entries) {
+    acc += e.angle;
+    if (norm <= acc) return e.label;
   }
 }
 
-// ----------- SPIN -----------
+// ======================= SPIN =======================
 
 function spinWheel() {
   if (spinning) return;
-  const entries = getEntries();
-  if (!entries.length) return;
+  if (!getEntries().length) return;
 
   spinning = true;
-
-  const spinDuration = random(4500, 6000);
-  const spinAngle = random(8, 12) * Math.PI * 2;
+  const duration = rand(4500, 6000);
+  const spinAngle = rand(8, 12) * Math.PI * 2;
   const start = performance.now();
-  const initialRotation = rotation;
+  const base = rotation;
 
   function animate(now) {
-    const elapsed = now - start;
-    const progress = Math.min(elapsed / spinDuration, 1);
-    const eased = easeOutCubic(progress);
-
-    rotation = initialRotation + spinAngle * eased;
+    const t = Math.min((now - start) / duration, 1);
+    rotation = base + spinAngle * easeOutCubic(t);
     drawWheel();
 
-    if (progress < 1) {
+    if (t < 1) {
       requestAnimationFrame(animate);
     } else {
       spinning = false;
       const winner = getWinner();
-      console.log("Winner:", winner);
+      results.unshift(winner);
+      updateResults();
     }
   }
-
   requestAnimationFrame(animate);
 }
 
-// ----------- EVENTS -----------
+// ======================= RESULTS =======================
 
-spinBtn.addEventListener("click", spinWheel);
-namesInput.addEventListener("input", drawWheel);
+function updateResults() {
+  resultsList.innerHTML = "";
+  results.forEach(r => {
+    const li = document.createElement("li");
+    li.textContent = r;
+    resultsList.appendChild(li);
+  });
+
+  resultsTab.textContent = `Results (${results.length})`;
+}
+
+// ======================= TABS =======================
+
+entriesTab.onclick = () => {
+  entriesTab.classList.add("active");
+  resultsTab.classList.remove("active");
+  entriesPanel.classList.add("active");
+  resultsPanel.classList.remove("active");
+};
+
+resultsTab.onclick = () => {
+  resultsTab.classList.add("active");
+  entriesTab.classList.remove("active");
+  resultsPanel.classList.add("active");
+  entriesPanel.classList.remove("active");
+};
+
+// ======================= EVENTS =======================
+
+spinBtn.onclick = spinWheel;
+namesInput.oninput = () => {
+  const count = getEntries().length;
+  entriesTab.textContent = `Entries (${count})`;
+  drawWheel();
+};
 
 // Initial draw
 drawWheel();
