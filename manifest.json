@@ -1,1 +1,11 @@
+// ======================= manifest.json =======================
+{
+  "name": "Free Wheel of Names",
+  "short_name": "Wheel",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#111",
+  "theme_color": "#111",
+  "icons": []
+}
 
