@@ -1,0 +1,60 @@
+<!-- ======================= index.html ======================= -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Free Wheel of Names – Random Picker</title>
+<meta name="description" content="Free wheel of names picker. Spin the wheel online for classrooms, giveaways, raffles, and teams.">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- SEO -->
+<link rel="canonical" href="https://yourdomain.com/">
+<meta property="og:title" content="Free Wheel of Names">
+<meta property="og:description" content="Spin the wheel to pick a random name. 100% free.">
+<meta property="og:type" content="website">
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#222">
+
+<link rel="stylesheet" href="style.css">
+
+<!-- AdSense (replace ID) -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+</head>
+<body>
+
+<header>
+  <h1>🎡 Free Wheel of Names</h1>
+  <nav>
+    <a href="classroom.html">Classroom</a>
+    <a href="giveaway.html">Giveaway</a>
+  </nav>
+</header>
+
+<main>
+  <canvas id="wheel" width="320" height="320"></canvas>
+  <button id="spinBtn">SPIN</button>
+
+  <textarea id="names" placeholder="Enter names, one per line"></textarea>
+</main>
+
+<!-- Ad below interaction (RPM safe) -->
+<div class="ads">
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-XXXXXXXX"
+       data-ad-slot="1234567890"
+       data-ad-format="auto"></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</div>
+
+<script src="app.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+</script>
+
+</body>
+</html>
